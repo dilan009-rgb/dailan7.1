@@ -486,7 +486,7 @@ import { initializeApp } from
 
 import {
   getAuth, createUserWithEmailAndPassword,
-  signInWithEmailAndPassword, onAuthStateChanged, signOut
+  signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
 import {
@@ -599,8 +599,12 @@ $("authForm").onsubmit = async event => {
         return;
       }
 
-      // Comprobación básica. Para producción, la unicidad debe
-      // garantizarse en el servidor mediante una transacción.
+      // Primero iniciamos sesión para que las reglas de Firestore
+      // permitan comprobar si el nombre de usuario ya está ocupado.
+      const credential = await createUserWithEmailAndPassword(
+        auth, email, password
+      );
+
       const existing = await getDocs(query(
         collection(db, "users"),
         where("username", "==", username),
@@ -608,13 +612,10 @@ $("authForm").onsubmit = async event => {
       ));
 
       if (!existing.empty) {
-        error("Ese nombre de usuario ya está ocupado.");
+        await deleteUser(credential.user);
+        error("Ese nombre de usuario ya está ocupado. Prueba con otro.");
         return;
       }
-
-      const credential = await createUserWithEmailAndPassword(
-        auth, email, password
-      );
 
       await setDoc(doc(db, "users", credential.user.uid), {
         uid: credential.user.uid,
