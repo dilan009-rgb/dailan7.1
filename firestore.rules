@@ -25,7 +25,6 @@ service cloud.firestore {
         && request.resource.data.name is string
         && request.resource.data.name.size() >= 2
         && request.resource.data.name.size() <= 60
-        && request.resource.data.email is string
         && request.resource.data.bio == ''
         && request.resource.data.blocked is list;
 
