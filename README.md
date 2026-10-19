@@ -1,1 +1,1173 @@
 # dailan7.1
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090812">
+<title>Dailan7.1 | Neon Chat</title>
+
+<style>
+:root {
+  --bg: #090812;
+  --panel: #131124;
+  --panel2: #201a36;
+  --border: #382852;
+  --purple: #a855f7;
+  --cyan: #22d3ee;
+  --text: #f5f3ff;
+  --muted: #aaa5c5;
+  --danger: #fb7185;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: radial-gradient(ellipse at top left, #281044, transparent 40%),
+              radial-gradient(ellipse at bottom right, #06323d, transparent 35%),
+              var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+button, input { font: inherit; }
+button { cursor: pointer; color: inherit; }
+.hidden { display: none !important; }
+
+button, input {
+  border-radius: 11px;
+}
+
+input {
+  background: #0c0a17;
+  color: white;
+  border: 1px solid var(--border);
+  padding: 12px;
+  width: 100%;
+  margin: 5px 0;
+}
+
+input:focus {
+  outline: 2px solid var(--purple);
+}
+
+.btn {
+  background: linear-gradient(110deg, #7c3aed, #a855f7);
+  border: 0;
+  padding: 11px 15px;
+  font-weight: bold;
+}
+
+.secondary {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  padding: 10px;
+}
+
+.danger {
+  background: #581c32;
+  border: 1px solid #be3455;
+  padding: 10px;
+}
+
+.brand {
+  font-size: 25px;
+  font-weight: 900;
+}
+
+.brand span {
+  color: var(--cyan);
+  text-shadow: 0 0 18px var(--cyan);
+}
+
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+
+#auth {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.auth-card {
+  width: min(100%, 420px);
+  padding: 28px;
+  background: #121020ee;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  box-shadow: 0 0 45px #a855f722;
+}
+
+.auth-card h1 { margin-bottom: 5px; }
+.auth-card .btn { width: 100%; margin-top: 12px; }
+#authError { color: var(--danger); min-height: 22px; }
+
+#app {
+  max-width: 1450px;
+  min-height: 100vh;
+  margin: auto;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.sidebar, .main {
+  background: #11101eee;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  min-height: calc(100vh - 32px);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+}
+
+.side-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.row-between {
+  justify-content: space-between;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #7c3aed, #0891b2);
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.search-box { padding: 12px; }
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 12px 12px;
+}
+
+.actions button { font-size: 13px; }
+
+.section-title {
+  padding: 12px 16px;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--muted);
+}
+
+#contacts {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.contact {
+  width: 100%;
+  padding: 13px;
+  border: 0;
+  border-top: 1px solid #27213b;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  background: transparent;
+}
+
+.contact:hover, .contact.active {
+  background: #29203e;
+}
+
+.contact-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.contact-info strong, .contact-info small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contact-info small {
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+#welcome {
+  text-align: center;
+  margin: auto;
+  padding: 25px;
+}
+
+.big-icon {
+  font-size: 70px;
+  color: var(--purple);
+  text-shadow: 0 0 35px var(--purple);
+}
+
+#chatView {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.chat-header {
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #171429;
+  border-bottom: 1px solid var(--border);
+}
+
+.chat-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-title strong, .chat-title small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.chat-title small {
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.header-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.header-buttons button {
+  padding: 9px;
+}
+
+#messages {
+  flex: 1;
+  min-height: 250px;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bubble {
+  max-width: 80%;
+  align-self: flex-start;
+  padding: 11px 13px;
+  border-radius: 14px;
+  background: #241d38;
+  border: 1px solid var(--border);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.bubble.mine {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #542b80, #164453);
+}
+
+.bubble img {
+  display: block;
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+
+.bubble time {
+  display: block;
+  font-size: 11px;
+  color: #c9c2df;
+  text-align: right;
+  margin-top: 6px;
+}
+
+.composer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #171429;
+  border-top: 1px solid var(--border);
+}
+
+.composer input[type="text"] {
+  flex: 1;
+  min-width: 0;
+}
+
+.composer button { flex-shrink: 0; }
+
+#profileView {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+#profileView input { display: block; }
+
+#profileView textarea {
+  width: 100%;
+  padding: 12px;
+  background: #0c0a17;
+  border: 1px solid var(--border);
+  color: white;
+  border-radius: 10px;
+}
+
+.mobile-back { display: none; }
+
+@media (max-width: 760px) {
+  #app {
+    display: block;
+    padding: 0;
+    min-height: 100dvh;
+  }
+
+  .sidebar, .main {
+    min-height: 100dvh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  #app.chat-open .sidebar { display: none; }
+  #app:not(.chat-open) .main { display: none; }
+
+  .mobile-back { display: inline-block; }
+  .chat-header { padding: 10px; }
+  #messages { padding: 12px; }
+  .bubble { max-width: 90%; }
+  .header-buttons button { padding: 7px; }
+  .composer { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+}
+</style>
+</head>
+
+<body>
+
+<section id="auth">
+  <div class="auth-card">
+    <div class="brand">Dailan<span>7.1 ✦</span></div>
+    <h1 id="authTitle">Inicia sesión</h1>
+    <p class="muted">Tu espacio de chat con luces de neón.</p>
+
+    <form id="authForm">
+      <input id="name" placeholder="Tu nombre" maxlength="60" class="hidden">
+      <input id="username" placeholder="Usuario o correo electrónico" required>
+      <input id="email" type="email" placeholder="Correo electrónico" class="hidden">
+      <input id="password" type="password" placeholder="Contraseña" minlength="8" required>
+      <button class="btn" id="authSubmit">Iniciar sesión</button>
+    </form>
+
+    <p class="small">
+      <span id="toggleText">¿No tienes cuenta?</span>
+      <button class="secondary" id="toggleAuth">Registrarme</button>
+    </p>
+    <div id="authError"></div>
+  </div>
+</section>
+
+<div id="app" class="hidden">
+
+  <aside class="sidebar">
+    <div class="side-header">
+      <div class="row row-between">
+        <div class="brand">Dailan<span>7.1</span></div>
+        <button class="secondary" id="profileBtn">👤</button>
+      </div>
+      <div class="row" style="margin-top:18px">
+        <div class="avatar" id="myAvatar">?</div>
+        <div>
+          <strong id="myName">Mi perfil</strong>
+          <div class="muted small" id="myUsername">@usuario</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-box">
+      <input id="searchChats" placeholder="Buscar conversación...">
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="findPeople">＋ Amigos</button>
+      <button class="secondary" id="createGroup">▦ Grupo</button>
+    </div>
+
+    <div class="section-title">CONVERSACIONES</div>
+    <div id="contacts">
+      <p class="muted" style="padding:15px">Configura Firebase para comenzar.</p>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section id="welcome">
+      <div class="big-icon">✦</div>
+      <h1>Bienvenido a Dailan7.1</h1>
+      <p class="muted">Busca amigos y empieza una conversación.</p>
+      <button class="btn" id="welcomeFind">Encontrar personas</button>
+    </section>
+
+    <section id="chatView" class="hidden">
+      <header class="chat-header">
+        <button class="secondary mobile-back" id="backBtn">←</button>
+        <div class="avatar" id="chatAvatar">?</div>
+        <div class="chat-title">
+          <strong id="chatName">Conversación</strong>
+          <small id="chatStatus">Mensajes en tiempo real</small>
+        </div>
+        <div class="header-buttons">
+          <button class="secondary" id="voiceCall" title="Llamada">📞</button>
+          <button class="secondary" id="videoCall" title="Videollamada">🎥</button>
+          <button class="secondary" id="chatOptions" title="Seguridad">⋯</button>
+        </div>
+      </header>
+
+      <div id="messages"></div>
+
+      <form class="composer" id="messageForm">
+        <button type="button" class="secondary" id="emojiBtn">😊</button>
+        <label class="secondary" style="padding:10px;cursor:pointer">
+          📷
+          <input id="imageInput" type="file" accept="image/*" hidden>
+        </label>
+        <input id="messageInput" type="text" maxlength="4000"
+               placeholder="Escribe un mensaje..." autocomplete="off">
+        <button class="btn" type="submit">➤</button>
+      </form>
+    </section>
+
+    <section id="profileView" class="hidden">
+      <button class="secondary" id="closeProfile">← Volver</button>
+      <h2>Mi perfil</h2>
+      <label>Nombre</label>
+      <input id="editName" maxlength="60">
+      <label>Descripción</label>
+      <input id="editBio" maxlength="160">
+      <label>Notas privadas de este dispositivo</label>
+      <textarea id="privateNotes" rows="5"></textarea>
+      <button class="btn" id="saveProfile">Guardar</button>
+      <hr style="border-color:var(--border);margin:20px 0">
+      <button class="danger" id="logoutBtn">Cerrar sesión</button>
+    </section>
+  </main>
+</div>
+
+<script type="module">
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+
+import {
+  getAuth, createUserWithEmailAndPassword,
+  signInWithEmailAndPassword, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+
+import {
+  getFirestore, doc, setDoc, getDoc, getDocs,
+  collection, query, where, orderBy, limit,
+  onSnapshot, addDoc, updateDoc, arrayUnion, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+import {
+  getStorage, ref, uploadBytes, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
+
+/* PEGA AQUÍ LA CONFIGURACIÓN DE TU PROYECTO FIREBASE */
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_PROYECTO.firebaseapp.com",
+  projectId: "TU_PROYECTO",
+  storageBucket: "TU_BUCKET",
+  messagingSenderId: "TU_SENDER_ID",
+  appId: "TU_APP_ID"
+};
+
+const $ = id => document.getElementById(id);
+let auth, db, storage, me, profile, activeChat;
+let chats = [], stopChats, stopMessages, registering = false;
+
+function error(message) {
+  $("authError").textContent = message;
+}
+
+function initials(name = "?") {
+  return name.trim().split(/\s+/).slice(0, 2)
+    .map(part => part[0] || "").join("").toUpperCase() || "?";
+}
+
+function showProfile() {
+  $("welcome").classList.add("hidden");
+  $("chatView").classList.add("hidden");
+  $("profileView").classList.remove("hidden");
+  $("app").classList.remove("chat-open");
+  $("editName").value = profile.name || "";
+  $("editBio").value = profile.bio || "";
+  $("privateNotes").value =
+    localStorage.getItem("notes_" + me.uid) || "";
+}
+
+function showWelcome() {
+  $("welcome").classList.remove("hidden");
+  $("chatView").classList.add("hidden");
+  $("profileView").classList.add("hidden");
+  $("app").classList.remove("chat-open");
+}
+
+function showApp() {
+  $("auth").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  $("myName").textContent = profile.name;
+  $("myUsername").textContent = "@" + profile.username;
+  $("myAvatar").textContent = initials(profile.name);
+}
+
+function showAuth() {
+  $("auth").classList.remove("hidden");
+  $("app").classList.add("hidden");
+  if (stopChats) stopChats();
+  if (stopMessages) stopMessages();
+}
+
+$("toggleAuth").onclick = () => {
+  registering = !registering;
+  $("authTitle").textContent =
+    registering ? "Crear cuenta" : "Iniciar sesión";
+  $("name").classList.toggle("hidden", !registering);
+  $("email").classList.toggle("hidden", !registering);
+  $("email").required = registering;
+  $("name").required = registering;
+  $("authSubmit").textContent =
+    registering ? "Registrarme" : "Iniciar sesión";
+  $("toggleText").textContent =
+    registering ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?";
+  $("toggleAuth").textContent =
+    registering ? "Iniciar sesión" : "Registrarme";
+  error("");
+};
+
+$("authForm").onsubmit = async event => {
+  event.preventDefault();
+
+  if (!auth) {
+    error("Primero debes configurar Firebase en el código.");
+    return;
+  }
+
+  const username = $("username").value.trim().toLowerCase();
+  const password = $("password").value;
+
+  try {
+    if (registering) {
+      const name = $("name").value.trim();
+      const email = $("email").value.trim().toLowerCase();
+
+      if (!/^[a-z0-9_]{3,24}$/.test(username)) {
+        error("El usuario debe tener entre 3 y 24 caracteres: letras, números o _.");
+        return;
+      }
+
+      if (name.length < 2) {
+        error("Escribe un nombre válido.");
+        return;
+      }
+
+      // Comprobación básica. Para producción, la unicidad debe
+      // garantizarse en el servidor mediante una transacción.
+      const existing = await getDocs(query(
+        collection(db, "users"),
+        where("username", "==", username),
+        limit(1)
+      ));
+
+      if (!existing.empty) {
+        error("Ese nombre de usuario ya está ocupado.");
+        return;
+      }
+
+      const credential = await createUserWithEmailAndPassword(
+        auth, email, password
+      );
+
+      await setDoc(doc(db, "users", credential.user.uid), {
+        uid: credential.user.uid,
+        name,
+        username,
+        email,
+        bio: "",
+        blocked: [],
+        createdAt: serverTimestamp()
+      });
+
+    } else {
+      // Para iniciar sesión escribe el correo en el campo de usuario.
+      const email = $("username").value.trim().toLowerCase();
+
+      if (!email.includes("@")) {
+        error("Escribe tu correo electrónico para iniciar sesión.");
+        return;
+      }
+
+      await signInWithEmailAndPassword(auth, email, password);
+    }
+  } catch (e) {
+    const errors = {
+      "auth/invalid-credential": "Correo o contraseña incorrectos.",
+      "auth/email-already-in-use": "Ese correo ya está registrado.",
+      "auth/weak-password": "La contraseña debe tener al menos 8 caracteres.",
+      "auth/invalid-email": "El correo no es válido.",
+      "permission-denied": "Firebase rechazó la acción. Revisa las reglas."
+    };
+    error(errors[e.code] || e.message || "No se pudo completar la operación.");
+  }
+};
+
+function listenChats() {
+  if (stopChats) stopChats();
+
+  const q = query(collection(db, "chats"),
+    where("members", "array-contains", me.uid));
+
+  stopChats = onSnapshot(q, snapshot => {
+    chats = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderChats();
+  }, e => error(e.message));
+}
+
+function chatTitle(chat) {
+  if (chat.isGroup) return chat.name || "Grupo";
+
+  const other = (chat.memberNames || [])
+    .find(person => person.uid !== me.uid);
+
+  return other?.name || "Conversación";
+}
+
+function renderChats() {
+  const list = $("contacts");
+  list.replaceChildren();
+
+  const term = $("searchChats").value.toLowerCase();
+
+  const filtered = chats.filter(chat =>
+    chatTitle(chat).toLowerCase().includes(term) ||
+    (chat.memberNames || []).some(person =>
+      person.username?.toLowerCase().includes(term)
+    )
+  );
+
+  if (!filtered.length) {
+    list.textContent = "No tienes chats. Agrega gente para comenzar.";
+    list.className = "muted";
+    list.style.padding = "20px";
+    return;
+  }
+
+  list.className = "";
+  list.style.padding = "";
+
+  for (const chat of filtered) {
+    const button = document.createElement("button");
+    button.className = "contact" +
+      (activeChat?.id === chat.id ? " active" : "");
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar";
+    avatar.textContent = initials(chatTitle(chat));
+
+    const info = document.createElement("div");
+    info.className = "contact-info";
+
+    const title = document.createElement("strong");
+    title.textContent = chatTitle(chat);
+
+    const preview = document.createElement("small");
+    preview.textContent = chat.lastMessage || "Toca para conversar";
+
+    info.append(title, preview);
+    button.append(avatar, info);
+    button.onclick = () => openChat(chat);
+    list.append(button);
+  }
+}
+
+$("searchChats").oninput = renderChats;
+
+async function openChat(chat) {
+  activeChat = chat;
+  $("app").classList.add("chat-open");
+
+  $("welcome").classList.add("hidden");
+  $("profileView").classList.add("hidden");
+  $("chatView").classList.remove("hidden");
+
+  $("chatName").textContent = chatTitle(chat);
+  $("chatAvatar").textContent = initials(chatTitle(chat));
+  $("chatStatus").textContent = chat.isGroup
+    ? "Grupo" : "Conversación privada";
+
+  if (stopMessages) stopMessages();
+
+  const q = query(
+    collection(db, "chats", chat.id, "messages"),
+    orderBy("createdAt", "asc"),
+    limit(300)
+  );
+
+  stopMessages = onSnapshot(q, snapshot => {
+    const area = $("messages");
+    area.replaceChildren();
+
+    for (const messageDoc of snapshot.docs) {
+      renderMessage(messageDoc.data());
+    }
+
+    area.scrollTop = area.scrollHeight;
+  }, e => error(e.message));
+
+  renderChats();
+}
+
+function renderMessage(message) {
+  const bubble = document.createElement("div");
+  bubble.className = "bubble" +
+    (message.senderId === me.uid ? " mine" : "");
+
+  if (message.senderId !== me.uid) {
+    const sender = document.createElement("strong");
+    sender.textContent = (message.senderName || "Usuario") + ": ";
+    bubble.append(sender);
+  }
+
+  if (message.text) {
+    const text = document.createElement("span");
+    text.textContent = message.text;
+    bubble.append(text);
+  }
+
+  if (message.imageUrl) {
+    const image = document.createElement("img");
+    image.src = message.imageUrl;
+    image.alt = "Imagen compartida";
+    image.loading = "lazy";
+    bubble.append(image);
+  }
+
+  const time = document.createElement("time");
+  time.textContent = message.createdAt?.toDate
+    ? message.createdAt.toDate().toLocaleTimeString("es-CO", {
+        hour: "2-digit", minute: "2-digit"
+      })
+    : "Enviando...";
+
+  bubble.append(time);
+  $("messages").append(bubble);
+}
+
+async function sendMessage(text, imageUrl = null) {
+  if (!activeChat || (!text.trim() && !imageUrl)) return;
+
+  const otherMembers = activeChat.members.filter(uid => uid !== me.uid);
+
+  if (otherMembers.some(uid => (profile.blocked || []).includes(uid))) {
+    alert("Tienes bloqueado a un participante de esta conversación.");
+    return;
+  }
+
+  await addDoc(collection(db, "chats", activeChat.id, "messages"), {
+    senderId: me.uid,
+    senderName: profile.name,
+    text: text.trim(),
+    imageUrl,
+    createdAt: serverTimestamp()
+  });
+
+  await updateDoc(doc(db, "chats", activeChat.id), {
+    lastMessage: text.trim() || (imageUrl ? "📷 Imagen" : ""),
+    updatedAt: serverTimestamp()
+  });
+}
+
+$("messageForm").onsubmit = async event => {
+  event.preventDefault();
+
+  const input = $("messageInput");
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  input.value = "";
+
+  try {
+    await sendMessage(text);
+  } catch (e) {
+    input.value = text;
+    alert(e.message);
+  }
+};
+
+$("emojiBtn").onclick = () => {
+  const emoji = prompt("Escribe o copia un emoji:", "😀");
+
+  if (emoji) {
+    $("messageInput").value += emoji;
+    $("messageInput").focus();
+  }
+};
+
+async function findPeople() {
+  const username = prompt("Escribe el usuario exacto de tu amigo:");
+
+  if (!username) return;
+
+  const normalized = username.trim().replace(/^@/, "").toLowerCase();
+
+  if (normalized === profile.username) {
+    alert("Ese es tu propio usuario.");
+    return;
+  }
+
+  try {
+    const result = await getDocs(query(
+      collection(db, "users"),
+      where("username", "==", normalized),
+      limit(1)
+    ));
+
+    if (result.empty) {
+      alert("No encontramos a ese usuario.");
+      return;
+    }
+
+    const person = result.docs[0].data();
+
+    if ((profile.blocked || []).includes(person.uid)) {
+      alert("Tienes bloqueado a ese usuario.");
+      return;
+    }
+
+    const existing = chats.find(chat =>
+      !chat.isGroup &&
+      chat.members.includes(me.uid) &&
+      chat.members.includes(person.uid)
+    );
+
+    if (existing) {
+      await openChat(existing);
+      return;
+    }
+
+    const members = [me.uid, person.uid].sort();
+
+    const memberNames = [
+      { uid: me.uid, name: profile.name, username: profile.username },
+      { uid: person.uid, name: person.name, username: person.username }
+    ];
+
+    const created = await addDoc(collection(db, "chats"), {
+      members,
+      memberNames,
+      isGroup: false,
+      createdBy: me.uid,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      lastMessage: "Conversación iniciada"
+    });
+
+    await openChat({
+      id: created.id,
+      members,
+      memberNames,
+      isGroup: false,
+      lastMessage: "Conversación iniciada"
+    });
+
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+$("findPeople").onclick = findPeople;
+$("welcomeFind").onclick = findPeople;
+
+$("createGroup").onclick = async () => {
+  const name = prompt("Nombre del grupo:");
+  if (!name?.trim()) return;
+
+  const usernames = prompt(
+    "Usuarios que quieres agregar, separados por coma:"
+  );
+
+  if (!usernames) return;
+
+  try {
+    const members = [me.uid];
+    const memberNames = [{
+      uid: me.uid,
+      name: profile.name,
+      username: profile.username
+    }];
+
+    for (const raw of usernames.split(",")) {
+      const username = raw.trim().replace(/^@/, "").toLowerCase();
+      if (!username) continue;
+
+      const result = await getDocs(query(
+        collection(db, "users"),
+        where("username", "==", username),
+        limit(1)
+      ));
+
+      if (!result.empty) {
+        const person = result.docs[0].data();
+
+        if (!members.includes(person.uid) &&
+            !(profile.blocked || []).includes(person.uid)) {
+          members.push(person.uid);
+          memberNames.push({
+            uid: person.uid,
+            name: person.name,
+            username: person.username
+          });
+        }
+      }
+    }
+
+    if (members.length < 2) {
+      alert("Agrega al menos otro usuario válido.");
+      return;
+    }
+
+    const created = await addDoc(collection(db, "chats"), {
+      name: name.trim(),
+      members,
+      memberNames,
+      isGroup: true,
+      createdBy: me.uid,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      lastMessage: "Grupo creado"
+    });
+
+    await openChat({
+      id: created.id,
+      name: name.trim(),
+      members,
+      memberNames,
+      isGroup: true,
+      lastMessage: "Grupo creado"
+    });
+
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
+$("chatOptions").onclick = async () => {
+  if (!activeChat) return;
+
+  const option = prompt(
+    "SEGURIDAD\n1. Bloquear participantes\n2. Reportar conversación\n3. Ver participantes"
+  );
+
+  const otherIds = activeChat.members.filter(uid => uid !== me.uid);
+
+  if (option === "1") {
+    if (!confirm("¿Quieres bloquear a los participantes de este chat?"))
+      return;
+
+    try {
+      await updateDoc(doc(db, "users", me.uid), {
+        blocked: arrayUnion(...otherIds)
+      });
+
+      profile.blocked = [
+        ...new Set([...(profile.blocked || []), ...otherIds])
+      ];
+
+      alert("Bloqueo guardado.");
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  if (option === "2") {
+    const reason = prompt("Explica el motivo del reporte:");
+    if (!reason?.trim()) return;
+
+    try {
+      await addDoc(collection(db, "reports"), {
+        reporterId: me.uid,
+        chatId: activeChat.id,
+        reportedIds: otherIds,
+        reason: reason.trim().slice(0, 1000),
+        status: "pending",
+        createdAt: serverTimestamp()
+      });
+
+      alert("Reporte enviado para revisión administrativa.");
+    } catch (e) {
+      alert(e.message);
+    }
+  }
+
+  if (option === "3") {
+    alert(activeChat.memberNames.map(p =>
+      "@" + p.username + " — " + p.name
+    ).join("\n"));
+  }
+};
+
+$("profileBtn").onclick = showProfile;
+$("closeProfile").onclick = showWelcome;
+
+$("saveProfile").onclick = async () => {
+  const name = $("editName").value.trim();
+  if (name.length < 2) return alert("Escribe un nombre válido.");
+
+  try {
+    const bio = $("editBio").value.trim().slice(0, 160);
+
+    await updateDoc(doc(db, "users", me.uid), { name, bio });
+
+    profile.name = name;
+    profile.bio = bio;
+
+    localStorage.setItem("notes_" + me.uid, $("privateNotes").value);
+
+    showApp();
+    alert("Perfil y notas guardados.");
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
+$("logoutBtn").onclick = () => signOut(auth);
+$("backBtn").onclick = () => {
+  activeChat = null;
+  showWelcome();
+};
+
+$("imageInput").onchange = async event => {
+  const file = event.target.files[0];
+  event.target.value = "";
+
+  if (!file || !activeChat) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("Selecciona una imagen válida.");
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    alert("La imagen debe pesar menos de 5 MB.");
+    return;
+  }
+
+  try {
+    const path = `chatImages/${activeChat.id}/${me.uid}/${Date.now()}`;
+    const storageRef = ref(storage, path);
+
+    await uploadBytes(storageRef, file, {
+      contentType: file.type
+    });
+
+    const url = await getDownloadURL(storageRef);
+    await sendMessage("", url);
+  } catch (e) {
+    alert(e.message);
+  }
+};
+
+function openCall(type) {
+  if (!activeChat) return;
+
+  const room = "Dailan71-" + activeChat.id;
+
+  alert(
+    "Se abrirá una sala externa de " + type +
+    ". Esta versión es una demostración; la sala no tiene " +
+    "autenticación integrada con las cuentas de Dailan7.1."
+  );
+
+  window.open(
+    "https://meet.jit.si/" + encodeURIComponent(room),
+    "_blank",
+    "noopener,noreferrer"
+  );
+}
+
+$("voiceCall").onclick = () => openCall("audio");
+$("videoCall").onclick = () => openCall("videollamada");
+
+const firebaseReady =
+  firebaseConfig.apiKey !== "TU_API_KEY" &&
+  firebaseConfig.projectId !== "TU_PROYECTO";
+
+if (firebaseReady) {
+  const app = initializeApp(firebaseConfig);
+
+  auth = getAuth(app);
+  db = getFirestore(app);
+  storage = getStorage(app);
+
+  onAuthStateChanged(auth, async user => {
+    me = user;
+
+    if (!user) {
+      showAuth();
+      return;
+    }
+
+    try {
+      const snapshot = await getDoc(doc(db, "users", user.uid));
+
+      if (!snapshot.exists()) {
+        await signOut(auth);
+        error("No se encontró tu perfil.");
+        return;
+      }
+
+      profile = snapshot.data();
+      showApp();
+      listenChats();
+
+    } catch (e) {
+      error(e.message);
+    }
+  });
+
+} else {
+  error("Configura Firebase para activar el registro y los mensajes.");
+}
+</script>
+</body>
+</html>
