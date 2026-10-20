@@ -386,6 +386,9 @@ input:focus {
 
   #app.chat-open .sidebar { display: none; }
   #app:not(.chat-open) .main { display: none; }
+  /* En móvil, mostrar el perfil como una pantalla propia */
+  #app.profile-open .sidebar { display: none; }
+  #app.profile-open .main { display: flex; }
 
   .mobile-back { display: inline-block; }
   .chat-header { padding: 10px; }
@@ -472,6 +475,7 @@ input:focus {
         <div class="header-buttons">
           <button class="secondary" id="voiceCall" title="Llamada">📞</button>
           <button class="secondary" id="videoCall" title="Videollamada">🎥</button>
+          <button class="secondary" id="chatProfileBtn" title="Mi perfil">👤</button>
           <button class="secondary" id="chatOptions" title="Seguridad">⋯</button>
         </div>
       </header>
@@ -575,6 +579,7 @@ function showProfile() {
   $("chatView").classList.add("hidden");
   $("profileView").classList.remove("hidden");
   $("app").classList.remove("chat-open");
+  $("app").classList.add("profile-open");
   $("editName").value = profile.name || "";
   $("editBio").value = profile.bio || "";
   $("privateNotes").value =
@@ -585,12 +590,12 @@ function showWelcome() {
   $("welcome").classList.remove("hidden");
   $("chatView").classList.add("hidden");
   $("profileView").classList.add("hidden");
-  $("app").classList.remove("chat-open");
+  $("app").classList.remove("chat-open", "profile-open");
 }
 
 function showApp() {
   $("auth").classList.add("hidden");
-  $("app").classList.remove("hidden");
+  $("app").classList.remove("hidden", "profile-open");
   $("myName").textContent = profile.name;
   $("myUsername").textContent = "@" + profile.username;
   $("myAvatar").textContent = initials(profile.name);
@@ -1132,6 +1137,7 @@ $("chatOptions").onclick = async () => {
 };
 
 $("profileBtn").onclick = showProfile;
+$("chatProfileBtn").onclick = showProfile;
 $("closeProfile").onclick = showWelcome;
 
 $("saveProfile").onclick = async () => {
