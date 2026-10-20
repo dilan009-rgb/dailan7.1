@@ -1005,8 +1005,8 @@ async function findPeople(username) {
   }
 }
 
-$("findPeople").onclick = findPeople;
-$("welcomeFind").onclick = findPeople;
+$("findPeople").onclick = () => openActionModal("friends");
+$("welcomeFind").onclick = () => openActionModal("friends");
 
 async function createGroup(name, usernames) {
   if (!name?.trim() || !usernames?.trim()) return;
