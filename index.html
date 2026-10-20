@@ -343,6 +343,32 @@ input:focus {
   border-radius: 10px;
 }
 
+/* Ventana pequeña para Amigos y Grupos */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: #05040bd9;
+  backdrop-filter: blur(7px);
+}
+.modal-card {
+  width: min(100%, 390px);
+  padding: 22px;
+  background: linear-gradient(155deg, #19142b, #0f0d1b);
+  border: 1px solid #67408a;
+  border-radius: 20px;
+  box-shadow: 0 18px 70px #0009, 0 0 28px #a855f722;
+}
+.modal-card h2 { margin: 0 0 6px; }
+.modal-card p { margin: 0 0 14px; line-height: 1.45; }
+.modal-card label { display: block; margin-top: 12px; font-size: 13px; color: var(--muted); }
+.modal-card input { margin: 6px 0 0; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.modal-actions button { min-width: 95px; }
+
 .mobile-back { display: none; }
 
 @media (max-width: 760px) {
@@ -478,6 +504,27 @@ input:focus {
       <button class="danger" id="logoutBtn">Cerrar sesión</button>
     </section>
   </main>
+</div>
+
+<div id="actionModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <form id="actionModalForm" class="modal-card">
+    <h2 id="modalTitle">Amigos</h2>
+    <p id="modalDescription" class="muted small">Encuentra personas en Dailan7.1.</p>
+    <div id="friendFields">
+      <label for="friendUsername">Nombre de usuario</label>
+      <input id="friendUsername" maxlength="30" placeholder="Ej. Nicolas Candia" autocomplete="off">
+    </div>
+    <div id="groupFields" class="hidden">
+      <label for="groupName">Nombre del grupo</label>
+      <input id="groupName" maxlength="50" placeholder="Ej. Los parceros" autocomplete="off">
+      <label for="groupUsernames">Usuarios para agregar</label>
+      <input id="groupUsernames" placeholder="usuarios separados por coma" autocomplete="off">
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="secondary" id="modalCancel">Cancelar</button>
+      <button type="submit" class="btn" id="modalSubmit">Buscar</button>
+    </div>
+  </form>
 </div>
 
 <script type="module">
@@ -842,10 +889,54 @@ $("emojiBtn").onclick = () => {
   }
 };
 
-async function findPeople() {
-  const username = prompt("Escribe el usuario exacto de tu amigo:");
+function openActionModal(mode) {
+  const isGroup = mode === "group";
+  $("actionModal").dataset.mode = mode;
+  $("modalTitle").textContent = isGroup ? "Crear grupo" : "Agregar amigo";
+  $("modalDescription").textContent = isGroup
+    ? "Ponle nombre al grupo y agrega los usuarios que quieras."
+    : "Escribe el nombre de usuario exacto de la persona.";
+  $("friendFields").classList.toggle("hidden", isGroup);
+  $("groupFields").classList.toggle("hidden", !isGroup);
+  $("modalSubmit").textContent = isGroup ? "Crear grupo" : "Buscar";
+  $("actionModal").classList.remove("hidden");
+  setTimeout(() => $(isGroup ? "groupName" : "friendUsername").focus(), 0);
+}
 
-  if (!username) return;
+function closeActionModal() {
+  $("actionModal").classList.add("hidden");
+  $("actionModalForm").reset();
+}
+
+$("modalCancel").onclick = closeActionModal;
+$("actionModal").onclick = event => {
+  if (event.target === $("actionModal")) closeActionModal();
+};
+$("actionModalForm").onsubmit = async event => {
+  event.preventDefault();
+  const mode = $("actionModal").dataset.mode;
+  if (mode === "group") {
+    const name = $("groupName").value.trim();
+    const usernames = $("groupUsernames").value.trim();
+    if (!name || !usernames) {
+      alert("Escribe el nombre del grupo y al menos un usuario.");
+      return;
+    }
+    closeActionModal();
+    await createGroup(name, usernames);
+  } else {
+    const username = $("friendUsername").value.trim();
+    if (!username) return;
+    closeActionModal();
+    await findPeople(username);
+  }
+};
+
+async function findPeople(username) {
+  if (!username) {
+    openActionModal("friends");
+    return;
+  }
 
   const normalized = username.trim().replace(/^@/, "").toLowerCase();
 
@@ -917,15 +1008,8 @@ async function findPeople() {
 $("findPeople").onclick = findPeople;
 $("welcomeFind").onclick = findPeople;
 
-$("createGroup").onclick = async () => {
-  const name = prompt("Nombre del grupo:");
-  if (!name?.trim()) return;
-
-  const usernames = prompt(
-    "Usuarios que quieres agregar, separados por coma:"
-  );
-
-  if (!usernames) return;
+async function createGroup(name, usernames) {
+  if (!name?.trim() || !usernames?.trim()) return;
 
   try {
     const members = [me.uid];
@@ -988,7 +1072,9 @@ $("createGroup").onclick = async () => {
   } catch (e) {
     alert(e.message);
   }
-};
+}
+
+$("createGroup").onclick = () => openActionModal("group");
 
 $("chatOptions").onclick = async () => {
   if (!activeChat) return;
