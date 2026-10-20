@@ -589,8 +589,8 @@ $("authForm").onsubmit = async event => {
       const name = $("name").value.trim();
       const email = $("email").value.trim().toLowerCase();
 
-      if (!/^[a-z0-9_]{3,24}$/.test(username)) {
-        error("El usuario debe tener entre 3 y 24 caracteres: letras, números o _.");
+      if (username.length < 1 || username.length > 30) {
+        error("El nombre de usuario debe tener entre 1 y 30 caracteres.");
         return;
       }
 
